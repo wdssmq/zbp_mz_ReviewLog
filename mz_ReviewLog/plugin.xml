@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plugin version="php">
+<id>mz_ReviewLog</id>
+<name>旧文章回顾</name>
+<url>//jq.qq.com/?_wv=1027&amp;k=555hND5</url>
+<note>按分类回顾旧文章</note>
+<description>置百丈玄冰而崩裂，掷须臾池水而漂摇。</description>
+<path>main.php</path>
+<include>include.php</include>
+<level>1</level>
+<author>
+  <name>沉冰浮水</name>
+  <email>wdssmq@qq.com</email>
+  <url>https://www.wdssmq.com</url>
+</author>
+<source>
+  <name></name>
+  <email></email>
+  <url></url>
+</source>
+<adapted>162210</adapted>
+<version>1.0.1</version>
+<pubdate>2022-08-08</pubdate>
+<modified>2022-08-08</modified>
+<price>13.7</price>
+<phpver>5.4</phpver>
+<advanced>
+  <dependency></dependency>
+  <rewritefunctions></rewritefunctions>
+  <existsfunctions></existsfunctions>
+  <conflict></conflict>
+</advanced>
+<sidebars>
+  <sidebar1></sidebar1>
+  <sidebar2></sidebar2>
+  <sidebar3></sidebar3>
+  <sidebar4></sidebar4>
+  <sidebar5></sidebar5>
+  <sidebar6></sidebar6>
+  <sidebar7></sidebar7>
+  <sidebar8></sidebar8>
+  <sidebar9></sidebar9>
+</sidebars>
+</plugin>
