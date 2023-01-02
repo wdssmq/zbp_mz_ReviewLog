@@ -4,6 +4,7 @@ RegisterPlugin("mz_ReviewLog", "ActivePlugin_mz_ReviewLog");
 function ActivePlugin_mz_ReviewLog()
 {
   Add_Filter_Plugin('Filter_Plugin_Zbp_BuildTemplate', 'mz_ReviewLog_GenTpl');
+  Add_Filter_Plugin('Filter_Plugin_Admin_Begin', 'mz_ReviewLog_SetHint');
 }
 
 function InstallPlugin_mz_ReviewLog()
@@ -24,6 +25,21 @@ function InstallPlugin_mz_ReviewLog()
 
 function UninstallPlugin_mz_ReviewLog()
 {
+}
+
+function mz_ReviewLog_SetHint()
+{
+  global $zbp;
+  if (!$zbp->CheckPlugin('mz_Notice')) {
+    return;
+  }
+  $data = array(
+    "ID" => "ReviewLog",
+    "Title" => "查看过往文章",
+    "Link" => mz_ReviewLog_Path("main", "host"),
+    "CycleDays" => 4,
+  );
+  mz_Notice_SetHintCycle($data);
 }
 
 // ------
