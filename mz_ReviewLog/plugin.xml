@@ -21,9 +21,9 @@
 <adapted>162210</adapted>
 <version>1.0.1</version>
 <pubdate>2022-08-08</pubdate>
-<modified>2022-08-08</modified>
-<price>13.7</price>
-<phpver>5.4</phpver>
+<modified>2023-01-02</modified>
+<price>0</price>
+<phpver>5.6</phpver>
 <advanced>
   <dependency></dependency>
   <rewritefunctions></rewritefunctions>

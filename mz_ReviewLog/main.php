@@ -32,6 +32,9 @@ require $blogpath . 'zb_system/admin/admin_top.php';
   </div>
   <div id="divMain2">
     <?php mz_ReviewLog_ViewPostList(); ?>
+    <hr>
+    <p>旧文章回顾 - Z-Blog 应用中心</p>
+    <p><a href="https://app.zblogcn.com/?id=31464" target="_blank" title="旧文章回顾 - Z-Blog 应用中心">https://app.zblogcn.com/?id=31464</a></p>
   </div>
 </div>
 
