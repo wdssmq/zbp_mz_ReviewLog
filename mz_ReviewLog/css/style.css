@@ -1,4 +1,16 @@
-.post a:visited {
-  color: goldenrod !important;
-  /* font-style: italic !important; */
+#divMain .post a {
+  color: #1d4c7d;
+}
+
+#divMain .post a:visited {
+  color: goldenrod;
+}
+
+#divMain .post a:hover {
+  color: #d60000;
+}
+
+#divMain .post a:active {
+  color: #d60000;
+  font-style: italic;
 }
