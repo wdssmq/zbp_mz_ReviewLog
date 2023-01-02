@@ -3,7 +3,7 @@
 </h3>
 
 {foreach $articles as $article}
-<p>
-  {$article.ID}、<a href="{$article.Url}" title="{$article.Title}">{$article.Title}</a>「{mz_ReviewLog_PostStatusConvert($article)}」
+<p class="post">
+  {$article.ID}、<a target="_blank" href="{$article.Url}" title="{$article.Title}">{$article.Title}</a>「{mz_ReviewLog_PostStatusConvert($article)}」
 </p>
 {/foreach}

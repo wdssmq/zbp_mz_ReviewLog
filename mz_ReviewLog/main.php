@@ -24,6 +24,7 @@ $blogtitle = '旧文章回顾';
 require $blogpath . 'zb_system/admin/admin_header.php';
 require $blogpath . 'zb_system/admin/admin_top.php';
 ?>
+<link rel="stylesheet" href="css/style.css">
 <div id="divMain">
   <div class="divHeader"><?php echo $blogtitle; ?></div>
   <div class="SubMenu">
