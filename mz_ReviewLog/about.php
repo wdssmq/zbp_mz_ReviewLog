@@ -136,8 +136,6 @@
   <p>更多广告：<a title="Vultr" target="_blank" href="https://www.wdssmq.com/category/%E5%B9%BF%E5%91%8A%E6%85%8E%E5%85%A5/">广告慎入 - 沉冰浮水</a></p>
   <p>更多应用：<a href="https://app.zblogcn.com/?auth=6401c4a7-89cd-48f9-a68b-d6464d8c3bc8" target="_blank" title="沉冰浮水 - Z-Blog 应用中心">沉冰浮水 - Z-Blog 应用中心</a></p>
   <hr><!-- -------- -->
-  <p>一款基于 QueryList V4 的 Z-Blog 采集插件：<a href="https://github.com/wdssmq/kumo-for-zblog" target="_blank" title="wdssmq/kumo-for-zblog: 一款基于QueryList V4的Z-Blog采集插件">https://github.com/wdssmq/kumo-for-zblog</a></p>
-  <p>某理念崩坏的采集插件 - Z-Blog 应用中心：<a href="https://app.zblogcn.com/?id=17788" target="_blank" title="某理念崩坏的采集插件 - Z-Blog 应用中心">https://app.zblogcn.com/?id=17788</a></p>
   <div style="min-height: 37px;"></div>
 </div>
 <div id="xnxf-contrib" class="in">
