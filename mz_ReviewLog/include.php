@@ -14,12 +14,19 @@ function ActivePlugin_mz_ReviewLog()
 // 接口函数 - 生成模板
 function mz_ReviewLog_GenTpl(&$templates)
 {
-  $tplCont = file_get_contents(mz_ReviewLog_Path("tpl-view-list"));
-  $templates["plugin_mz_ReviewLog_view-list"] = $tplCont;
-  $tplMod = file_get_contents(mz_ReviewLog_Path("tpl-view-mod"));
-  $templates["plugin_mz_ReviewLog_view-mod"] = $tplMod;
-  // 生成侧栏模块
-  mz_ReviewLog_BuildMod();
+  // 并不是每次都需要执行，所以加个随机
+  $rand = rand(1, 4);
+  if ($rand === 1) {
+    // 生成模板
+    $tplCont = file_get_contents(mz_ReviewLog_Path("tpl-view-list"));
+    $templates["plugin_mz_ReviewLog_view-list"] = $tplCont;
+    $tplMod = file_get_contents(mz_ReviewLog_Path("tpl-view-mod"));
+    $templates["plugin_mz_ReviewLog_view-mod"] = $tplMod;
+  }
+  if ($rand === 2) {
+    // 生成侧栏模块
+    mz_ReviewLog_BuildMod();
+  }
 }
 
 // 接口函数 - 后台提示
