@@ -23,7 +23,7 @@ function mz_ReviewLog_GenTpl(&$templates)
     $tplMod = file_get_contents(mz_ReviewLog_Path("tpl-view-mod"));
     $templates["plugin_mz_ReviewLog_view-mod"] = $tplMod;
   }
-  if ($rand === 2) {
+  if ($rand === 2 && isset($templates["plugin_mz_ReviewLog_view-mod"])) {
     // 生成侧栏模块
     mz_ReviewLog_BuildMod();
   }
