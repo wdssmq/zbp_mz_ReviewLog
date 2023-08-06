@@ -14,17 +14,14 @@ function ActivePlugin_mz_ReviewLog()
 // 接口函数 - 生成模板
 function mz_ReviewLog_GenTpl(&$templates)
 {
-  // 并不是每次都需要执行，所以加个随机
-  $rand = rand(1, 4);
-  if ($rand === 1) {
-    // 生成模板
-    $tplCont = file_get_contents(mz_ReviewLog_Path("tpl-view-list"));
-    $templates["plugin_mz_ReviewLog_view-list"] = $tplCont;
-    $tplMod = file_get_contents(mz_ReviewLog_Path("tpl-view-mod"));
-    $templates["plugin_mz_ReviewLog_view-mod"] = $tplMod;
-  }
-  if ($rand === 2 && isset($templates["plugin_mz_ReviewLog_view-mod"])) {
-    // 生成侧栏模块
+  // 生成模板
+  $tplCont = file_get_contents(mz_ReviewLog_Path("tpl-view-list"));
+  $templates["plugin_mz_ReviewLog_view-list"] = $tplCont;
+  $tplMod = file_get_contents(mz_ReviewLog_Path("tpl-view-mod"));
+  $templates["plugin_mz_ReviewLog_view-mod"] = $tplMod;
+
+  // 随机触发构建侧栏模块
+  if (mt_rand(0, 7) < 4) {
     mz_ReviewLog_BuildMod();
   }
 }
@@ -77,9 +74,16 @@ function UninstallPlugin_mz_ReviewLog()
 
 // ----------
 
+// 获取文章列表
 function mz_ReviewLog_ViewPostList($act = "return", $tpl = "mod")
 {
   global $zbp;
+
+  // 模板名称
+  $tplName = "plugin_mz_ReviewLog_view-{$tpl}";
+  // 判断模板是否存在
+  $isHasTpl = $zbp->template->HasTemplate($tplName);
+
   // 判断是否用于前台模块
   $isForMod = $tpl === "mod";
   // 读取配置文件
@@ -100,10 +104,14 @@ function mz_ReviewLog_ViewPostList($act = "return", $tpl = "mod")
   );
   // 对 $articles 去重
   $articles = array_unique($articles, SORT_REGULAR);
-  // 按模板输出
-  $zbp->template->SetTags('cate', $cate);
-  $zbp->template->SetTags('articles', $articles);
-  $rlt = $zbp->template->Output("plugin_mz_ReviewLog_view-{$tpl}");
+  if ($isHasTpl) {
+    // 按模板输出
+    $zbp->template->SetTags('cate', $cate);
+    $zbp->template->SetTags('articles', $articles);
+    $rlt = $zbp->template->Output($tplName);
+  } else {
+    $rlt = "模板不存在";
+  }
   if ($act === "echo") {
     echo $rlt;
   } else {
