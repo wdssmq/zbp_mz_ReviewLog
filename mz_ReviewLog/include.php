@@ -74,6 +74,22 @@ function UninstallPlugin_mz_ReviewLog()
 
 // ----------
 
+// 写入通知插件
+function mz_ReviewLog_WriteNotice($con)
+{
+  global $zbp;
+  if (!$zbp->CheckPlugin('mz_Notice')) {
+    return;
+  }
+  $data = array(
+    "Title" => "查看过往文章 -  本周旧文",
+    "Text" => $con,
+    "Url" => mz_ReviewLog_Path("main", "host"),
+    "Source" => "mz_ReviewLog",
+  );
+  mz_Notice_PostItem($data, true);
+}
+
 // 获取文章列表
 function mz_ReviewLog_ViewPostList($act = "return", $tpl = "mod")
 {
@@ -137,6 +153,8 @@ function mz_ReviewLog_BuildMod()
   $mod->Type = "ul";
   $mod->Content = $modCon;
   $mod->Save();
+  // 输出至通知插件
+  mz_ReviewLog_WriteNotice($modCon);
 }
 
 // 获取指定分类的文章
