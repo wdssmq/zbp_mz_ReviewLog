@@ -34,9 +34,9 @@ function mz_ReviewLog_SetHint()
     return;
   }
   $data = array(
-    "ID" => "ReviewLog",
+    "Source" => "ReviewLog",
     "Title" => "查看过往文章",
-    "Link" => mz_ReviewLog_Path("main", "host"),
+    "Url" => mz_ReviewLog_Path("main", "host"),
     "CycleDays" => 4,
   );
   mz_Notice_SetHintCycle($data);
