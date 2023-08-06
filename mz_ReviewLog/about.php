@@ -120,22 +120,39 @@
 <div id="xnxf-about">
   <!-- -------- -->
   <p>QQ：349467624 <a target="_blank" href="http://wpa.qq.com/msgrd?v=3&amp;uin=349467624&amp;site=qq&amp;menu=yes" title="沉冰浮水的QQ"><img src="https://www.wdssmq.com/zb_users/logos/qq_button.png" alt="QQ" title="QQ"></a></p>
-  <p>博客：<a target="_blank" href="https://www.wdssmq.com" title="沉冰浮水">https://www.wdssmq.com</a></p>
-  <p class="is-text-bold">Feed：<a target="_blank" href="https://feed.wdssmq.com" title="Feed">https://feed.wdssmq.com</a></p>
-  <p>bilibili：<a target="_blank" href="https://space.bilibili.com/44744006" title="bilibili">https://space.bilibili.com/44744006</a></p>
-  <p>GitHub：<a target="_blank" href="https://github.com/wdssmq" title="GitHub">https://github.com/wdssmq</a></p>
-  <p>GreasyFork：<a target="_blank" href="https://greasyfork.org/zh-CN/users/6865-wdssmq" title="GreasyFork">https://greasyfork.org/zh-CN/users/6865-wdssmq</a></p>
-  <p>嘟特（Mastodon ）：<a href="https://wxw.moe/@wdssmq" target="_blank" title="沉冰浮水 (@wdssmq@wxw.moe) - 呜呜 w(> ʌ <)w">https://wxw.moe/@wdssmq</a></p>
-  <p>知乎：<a target="_blank" href="https://www.zhihu.com/people/wdssmq" title="知乎">https://www.zhihu.com/people/wdssmq</a></p>
+
+  <p>博客：<a href="https://www.wdssmq.com" title="沉冰浮水的博客">https://www.wdssmq.com</a></p>
+
+  <p class="is-text-bold">Feed：<a href="http://feed.wdssmq.com" title="Feed_沉冰浮水">https://feed.wdssmq.com</a></p>
+
+  <p>嘟特：<a href="https://wxw.moe/users/wdssmq" title="沉冰浮水 - 呜呜 w(&gt; ʌ &lt;)w">https://wxw.moe/users/wdssmq</a></p>
+
+  <p>哔哩哔哩：<a href="https://space.bilibili.com/44744006" title="沉冰浮水_哔哩哔哩">https://space.bilibili.com/44744006</a></p>
+
+  <p>知乎：<a href="https://www.zhihu.com/people/wdssmq" title="沉冰浮水_知乎">https://www.zhihu.com/people/wdssmq</a></p>
+
+  <p>GitHub：<a href="https://github.com/wdssmq" title="沉冰浮水 - GitHub">https://github.com/wdssmq</a></p>
+
+  <p>GreasyFork：<a href="https://greasyfork.org/zh-CN/users/6865-wdssmq" title="wdsssmq - GreasyFork">https://greasyfork.org/zh-CN/users/6865-wdssmq</a></p>
+
   <hr><!-- -------- -->
+
   <p>文章推荐：「<a target="_blank" href="https://www.wdssmq.com/post/20201231613.html" title="「言说」RSS 是一种态度！！">RSS 是一种态度</a>」「<a href="https://www.wdssmq.com/post/20200617652.html" target="_blank" title="「水坑」系列教程索引_电脑网络_沉冰浮水">「水坑」系列教程索引_电脑网络_沉冰浮水</a>」</p>
+
   <hr><!-- -------- -->
-  <p>爱发电：<a target="_blank" href="https://afdian.net/@wdssmq" title="爱发电">https://afdian.net/@wdssmq</a></p>
+
+  <p>爱发电：<a target="_blank" href="https://afdian.net/a/wdssmq" title="爱发电">https://afdian.net/a/wdssmq</a></p>
+
   <p>[AD：<a title="老薛主机" target="_blank" href="https://my.laoxuehost.net/aff.php?aff=294">PHP 美国空间</a> 优惠码：15off-xnxf ]</p>
+
   <p>[AD：<a title="主机云" target="_blank" href="https://my.hostyun.com/page.aspx?c=referral&u=8680">vps-主机云</a>]</p>
+
   <p>更多广告：<a title="Vultr" target="_blank" href="https://www.wdssmq.com/category/%E5%B9%BF%E5%91%8A%E6%85%8E%E5%85%A5/">广告慎入 - 沉冰浮水</a></p>
+
   <p>更多应用：<a href="https://app.zblogcn.com/?auth=6401c4a7-89cd-48f9-a68b-d6464d8c3bc8" target="_blank" title="沉冰浮水 - Z-Blog 应用中心">沉冰浮水 - Z-Blog 应用中心</a></p>
+
   <hr><!-- -------- -->
+
   <div style="min-height: 37px;"></div>
 </div>
 <div id="xnxf-contrib" class="in">
