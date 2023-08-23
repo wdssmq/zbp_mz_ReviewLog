@@ -87,7 +87,7 @@ function mz_ReviewLog_WriteNotice($con)
     "Url" => mz_ReviewLog_Path("main", "host"),
     "Source" => "mz_ReviewLog",
   );
-  mz_Notice_PostItem($data, true);
+  mz_Notice_PostItem($data, 86400 * 4);
 }
 
 // 获取文章列表

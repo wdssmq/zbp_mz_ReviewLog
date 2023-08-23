@@ -20,7 +20,7 @@ InstallPlugin_mz_ReviewLog();
 
 $pickCate = mz_ReviewLog_ReadConfig();
 
-$blogtitle = '旧文章回顾';
+$blogtitle = '「水水」旧文章回顾';
 require $blogpath . 'zb_system/admin/admin_header.php';
 require $blogpath . 'zb_system/admin/admin_top.php';
 ?>
