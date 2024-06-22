@@ -54,16 +54,26 @@
     opacity: 1;
   }
 
-  i.xnxf-tip-dot {
-    background-color: red;
-    border-radius: 50%;
-    position: relative;
-    top: -3px;
-    right: -3px;
-    height: 7px;
-    width: 7px;
-    margin-left: -7px;
-    padding: 0;
+  .xnxf-about-btn.tip {
+    margin-right: 50%;
+    padding: 0 1em;
+  }
+
+  .xnxf-about-btn.tip span {
+    display: none;
+  }
+
+  .xnxf-about-btn.tip::before {
+    content: " ";
+    color: red;
+  }
+
+  .xnxf-about-btn.tip.reject::before {
+    content: "点击这里跳过提示";
+  }
+
+  .xnxf-about-btn.tip.continue::before {
+    content: "需要再点一次";
   }
 
   #xnxf-about {
@@ -114,7 +124,6 @@
   }
 </style>
 <a class="xnxf-about-btn" href="javascript:;" style="float: right;" title="查看/隐藏关于">
-  <i class="xnxf-tip-dot" style="float: right"></i>
   <span class="m-right">[关 于]</span>
 </a>
 <div id="xnxf-about">
@@ -133,7 +142,7 @@
 
   <p>GitHub：<a href="https://github.com/wdssmq" title="沉冰浮水 - GitHub">https://github.com/wdssmq</a></p>
 
-  <p>GreasyFork：<a href="https://greasyfork.org/zh-CN/users/6865-wdssmq" title="wdsssmq - GreasyFork">https://greasyfork.org/zh-CN/users/6865-wdssmq</a></p>
+  <!-- <p>GreasyFork：<a href="https://greasyfork.org/zh-CN/users/6865-wdssmq" title="wdsssmq - GreasyFork">https://greasyfork.org/zh-CN/users/6865-wdssmq</a></p> -->
 
   <hr><!-- -------- -->
 
@@ -157,61 +166,103 @@
 </div>
 <div id="xnxf-contrib" class="in">
   <p>虽然暂时还没有做区免费 Or 收费的判断，假定您是免费获取到的，而这个插件对您有用，请支付合理费用。</p>
-  <p><b>点击上方「关于」可关闭此提示，137 天内不再显示。</b></p>
+  <p><b>点击上方按钮可关闭此提示，137 天内不再显示。</b></p>
   <div id="xnxf-qr-box">
-    <img src="https://fastly.jsdelivr.net/gh/wdssmq/wdssmq@main/doc/qr-qq.png" alt="qr-qq" title="qr-qq" style="max-width:100%;">
-    <img src="https://fastly.jsdelivr.net/gh/wdssmq/wdssmq@main/doc/qr-wx.png" alt="qr-wx" title="qr-wx" style="max-width:100%;">
-    <img src="https://fastly.jsdelivr.net/gh/wdssmq/wdssmq@main/doc/qr-ali.png" alt="qr-ali" title="qr-ali" style="max-width:100%;">
+    <img src="https://cdn.jsdelivr.net/gh/wdssmq/wdssmq@main/doc/qr-qq.png" alt="qr-qq" title="qr-qq" style="max-width:100%;">
+    <img src="https://cdn.jsdelivr.net/gh/wdssmq/wdssmq@main/doc/qr-wx.png" alt="qr-wx" title="qr-wx" style="max-width:100%;">
+    <img src="https://cdn.jsdelivr.net/gh/wdssmq/wdssmq@main/doc/qr-ali.png" alt="qr-ali" title="qr-ali" style="max-width:100%;">
   </div>
   <div style="min-height: 37px;"></div>
 </div>
 <div class="clearfix"></div>
 <script type="text/javascript">
   $(function() {
-    const mz_blogtitle = '<?php echo $blogtitle; ?>';
-    const mz_cookie = GetCookie("xnxf-about-tip") || "";
+    const mz_appId = location.pathname.match(/zb_users\/[^\/]+\/([^\/]+)/)[1];
+    const mz_cookie = GetCookie("xnxf-about-tip") || "<?php echo GetVars("xnxf-about-tip", "COOKIE") ?>" || "";
 
-    let mz_ckeSet = 0;
-
-    if (mz_cookie.indexOf(mz_blogtitle) > -1 && 1 == 1) {
-      mz_ckeSet = 1;
-      fnHideTipDot();
-    } else {
-      $("#divMain2,.content-box-content").addClass("relative xnxf-fade");
-      let $elWrap;
-      if ($(".content-box-content").length > 0) {
-        $elWrap = $(".content-box-content");
-      } else {
-        $elWrap = $("#divMain2");
+    const mz_about = {
+      appId: mz_appId,
+      cookie: mz_cookie,
+      status: "def",
+      // 检查是否通过
+      _check() {
+        if (mz_cookie.indexOf(mz_appId) > -1 && 1 == 1) {
+          mz_about.status = "pass";
+          return true;
+        } else {
+          mz_about.status = "reject";
+          return false;
+        }
+      },
+      // 写入 cookie
+      _setCookie() {
+        SetCookie('xnxf-about-tip', `${mz_cookie},${mz_appId}`, 137)
+      },
+      // 切换提示
+      _toggleTip() {
+        // console.log(mz_about.status);
+        const $btn = $(".xnxf-about-btn");
+        $btn.removeClass(["tip", "reject", "continue"]);
+        if (mz_about.status === "pass") {
+          return;
+        }
+        $btn.addClass(["tip", mz_about.status]);
+      },
+      // 状态切换封装
+      _upStatus(to = "continue") {
+        mz_about.status = to;
+        // console.log(to);
+        mz_about._toggleTip();
+      },
+      // 检查不通过时强制显示
+      _forceShow() {
+        $("#divMain2,.content-box-content").addClass("relative xnxf-fade");
+        let $elWrap;
+        if ($(".content-box-content").length > 0) {
+          $elWrap = $(".content-box-content");
+        } else {
+          $elWrap = $("#divMain2");
+        }
+        $("#xnxf-contrib").appendTo($elWrap).addClass("absolute");
+        mz_about._toggleTip();
+      },
+      // 切换显示
+      _aboutToggle(inTab = false) {
+        // 对于 tab 页，再次点击切换至默认 tab
+        if (inTab && mz_about.status === "continue") {
+          $("a.default-tab").click();
+        }
+        // 检查不通过时，需要再次点击切换，同时更新 cookie
+        if (mz_about.status === "reject") {
+          mz_about._upStatus("continue");
+          mz_about._setCookie();
+        } else {
+          mz_about._upStatus("pass");
+        }
+        $(".absolute").removeClass("absolute");
+        $(".xnxf-fade").removeClass("xnxf-fade");
+        if (inTab) {
+          $("#xnxf-about,#xnxf-contrib").slideDown();
+        } else {
+          $("#divMain2,#xnxf-about,#xnxf-contrib").slideToggle();
+        }
+      },
+      // 主函数
+      _main() {
+        mz_about._check();
+        if (mz_about.status !== "pass") {
+          mz_about._forceShow();
+        }
       }
-      $("#xnxf-contrib").appendTo($elWrap).addClass("absolute");
     }
 
-    function fnHideTipDot() {
-      $('.xnxf-tip-dot').css({
-        opacity: 0
-      });
-    }
-
-    function fnAboutToggle(inTab = false) {
-      $(".absolute").removeClass("absolute");
-      $(".xnxf-fade").removeClass("xnxf-fade");
-      if (inTab) {
-        $("#xnxf-about,#xnxf-contrib").slideDown();
-      } else {
-        fnHideTipDot();
-        $("#divMain2,#xnxf-about,#xnxf-contrib").slideToggle();
-      }
-      if (mz_ckeSet == 0) {
-        SetCookie('xnxf-about-tip', `${mz_cookie},${mz_blogtitle}`, 137)
-      }
-    }
+    mz_about._main();
 
     $(".xnxf-about-btn").click(function() {
       if ($(this).hasClass("tab-btn")) {
-        fnAboutToggle(1);
+        mz_about._aboutToggle(true);
       } else {
-        fnAboutToggle();
+        mz_about._aboutToggle();
       }
     });
   });

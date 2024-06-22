@@ -27,6 +27,8 @@ RSS 订阅：[https://feed.wdssmq.com/](https://feed.wdssmq.com/ "沉冰浮水�
 
 ### 更新记录
 
+2024-06-22：使用 Feed 接口自动触发生成；
+
 2023-08-23：通知写入调用修改；
 
 2023-08-06：优化数据生成；适配「[通知中心 - Z-Blog 应用中心](https://app.zblogcn.com/?id=40598 "通知中心 - Z-Blog 应用中心")」

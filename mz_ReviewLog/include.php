@@ -9,6 +9,8 @@ function ActivePlugin_mz_ReviewLog()
   Add_Filter_Plugin('Filter_Plugin_Admin_Begin', 'mz_ReviewLog_SetHint');
   // 接口挂载 - 侧栏模块保存时防止 FileName 大小写变化
   Add_Filter_Plugin('Filter_Plugin_Module_Save', 'mz_ReviewLog_KeepModFileName');
+  // 接口挂载 - Feed 自动触发函数
+  Add_Filter_Plugin('Filter_Plugin_ViewFeed_End', 'mz_ReviewLog_RandBuildMod');
 }
 
 // 接口函数 - 生成模板
@@ -21,9 +23,7 @@ function mz_ReviewLog_GenTpl(&$templates)
   $templates["plugin_mz_ReviewLog_view-mod"] = $tplMod;
 
   // 随机触发构建侧栏模块
-  if (mt_rand(0, 7) < 4) {
-    mz_ReviewLog_BuildMod();
-  }
+  mz_ReviewLog_RandBuildMod(7);
 }
 
 // 接口函数 - 后台提示
@@ -49,6 +49,15 @@ function mz_ReviewLog_KeepModFileName(&$mod)
   if ("reviewlog-mod" === $mod->FileName) {
     // 将 $mod->FileName 恢复为原始值
     $mod->FileName = "ReviewLog-Mod";
+  }
+}
+
+// 接口函数 - Feed 自动触发函数
+function mz_ReviewLog_RandBuildMod($max = 13)
+{
+  // 随机触发构建侧栏模块
+  if (mt_rand(1, $max) <= 4) {
+    mz_ReviewLog_BuildMod();
   }
 }
 
