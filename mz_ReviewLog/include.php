@@ -10,7 +10,7 @@ function ActivePlugin_mz_ReviewLog()
   // 接口挂载 - 侧栏模块保存时防止 FileName 大小写变化
   Add_Filter_Plugin('Filter_Plugin_Module_Save', 'mz_ReviewLog_KeepModFileName');
   // 接口挂载 - Feed 自动触发函数
-  Add_Filter_Plugin('Filter_Plugin_ViewFeed_End', 'mz_ReviewLog_RandBuildMod');
+  Add_Filter_Plugin('Filter_Plugin_Feed_End', 'mz_ReviewLog_RandBuildMod');
 }
 
 // 接口函数 - 生成模板
@@ -53,7 +53,7 @@ function mz_ReviewLog_KeepModFileName(&$mod)
 }
 
 // 接口函数 - Feed 自动触发函数
-function mz_ReviewLog_RandBuildMod($max = 13)
+function mz_ReviewLog_RandBuildMod($max = 37)
 {
   // 随机触发构建侧栏模块
   if (mt_rand(1, $max) <= 4) {
