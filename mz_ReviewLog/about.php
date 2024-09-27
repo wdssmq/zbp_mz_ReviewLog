@@ -150,7 +150,7 @@
 
   <hr><!-- -------- -->
 
-  <p>爱发电：<a target="_blank" href="https://afdian.net/a/wdssmq" title="爱发电">https://afdian.net/a/wdssmq</a></p>
+  <p>爱发电：<a target="_blank" href="https://afdian.com/a/wdssmq" title="爱发电">https://afdian.com/a/wdssmq</a></p>
 
   <p>[AD：<a title="老薛主机" target="_blank" href="https://my.laoxuehost.net/aff.php?aff=294">PHP 美国空间</a> 优惠码：15off-xnxf ]</p>
 
