@@ -77,9 +77,7 @@ function InstallPlugin_mz_ReviewLog()
   $zbp->BuildTemplate();
 }
 
-function UninstallPlugin_mz_ReviewLog()
-{
-}
+function UninstallPlugin_mz_ReviewLog() {}
 
 // ----------
 
@@ -236,6 +234,9 @@ function mz_ReviewLog_ReadConfig()
 {
   // 读取配置文件
   $file = mz_ReviewLog_Path("config");
+  if (!is_file($file)) {
+    mz_ReviewLog_InitConfig($file);
+  }
   $config = file_get_contents($file);
   $config = json_decode($config, true);
 
