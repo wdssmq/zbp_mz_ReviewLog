@@ -387,25 +387,25 @@ function mz_ReviewLog_QueryRangeByCate($cateID)
 function mz_ReviewLog_CurWeek()
 {
   $timestamp = time();
-  $week = ceil($timestamp / (7 * 86400));
-  // $week = ceil($timestamp / (7 * 86400)) + mz_ReviewLog_DeBug();
+  $week = ceil($timestamp / (7 * 86400)) + mz_ReviewLog_DeBug();
   return $week;
 }
 
 function mz_ReviewLog_DeBug()
 {
   global $zbp;
-  $offset = $zbp->Config('mz_ReviewLog')->offset;
-  if (is_numeric($offset)) {
-    $offset = intval($offset);
+  $offset = 0;
+  if (isset($_GET['offset']) && is_numeric($_GET['offset'])) {
+    $offset = intval($_GET['offset']);
   } else {
+    $cfg = $zbp->Config('mz_ReviewLog');
+    if (isset($cfg->offset) && is_numeric($cfg->offset)) {
+      $offset = intval($cfg->offset);
+    }
+  }
+  if ($offset < 0) {
     $offset = 0;
   }
-  if (!$zbp->Config('mz_ReviewLog')->HasKey("flag")) {
-    $zbp->Config('mz_ReviewLog')->offset = $offset + 1;
-    $zbp->SaveConfig('mz_ReviewLog');
-  }
-  $zbp->Config('mz_ReviewLog')->flag = true;
   return $offset;
 }
 
