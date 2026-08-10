@@ -123,7 +123,7 @@ function mz_ReviewLog_ViewPostList($act = "return", $tpl = "mod")
   // 判断是否用于前台模块
   $isForMod = $tpl === "mod";
   // 读取配置文件
-  $pickCate = mz_ReviewLog_ReadConfig();
+  $pickCate = mz_ReviewLog_GetTgtCate();
   if (!is_array($pickCate) || !isset($pickCate["cateID"])) {
     $rlt = "暂无可用分类配置";
     if ($act === "echo") {
@@ -258,10 +258,16 @@ function mz_ReviewLog_UpdateConfig($pickCate, $endPost)
         continue;
       }
       if ($item["cateID"] == $pickCate["cateID"]) {
+        $isFirstCycle = !isset($item["cycled"]) || intval($item["cycled"]) === 0;
         $item["lstWeek"] = $curWeek;
-        $maxID = isset($item["range"]["MaxID"]) ? intval($item["range"]["MaxID"]) : 0;
-        $minID = isset($item["range"]["MinID"]) ? intval($item["range"]["MinID"]) : 0;
-        $item["lstID"] = $newID <= $maxID ? $newID : $minID;
+        if ($isFirstCycle) {
+          // 首次轮到该分类时仅锁定到当前周，不推进 lstID。
+          $item["cycled"] = 1;
+        } else {
+          $maxID = isset($item["range"]["MaxID"]) ? intval($item["range"]["MaxID"]) : 0;
+          $minID = isset($item["range"]["MinID"]) ? intval($item["range"]["MinID"]) : 0;
+          $item["lstID"] = $newID <= $maxID ? $newID : $minID;
+        }
       }
       $itemLstID = isset($item["lstID"]) ? intval($item["lstID"]) : 0;
       $itemMinID = isset($item["range"]["MinID"]) ? intval($item["range"]["MinID"]) : 0;
@@ -277,34 +283,38 @@ function mz_ReviewLog_UpdateConfig($pickCate, $endPost)
   return $bolRlt;
 }
 
-// 读取配置文件
-function mz_ReviewLog_ReadConfig()
+// 获取当前目标分类
+function mz_ReviewLog_GetTgtCate()
 {
   // 读取配置文件
-  $file = mz_ReviewLog_Path("config");
-  if (!is_file($file)) {
-    mz_ReviewLog_InitConfig($file);
-  }
   $config = mz_ReviewLog_LoadConfigArray();
   if (empty($config)) {
-    mz_ReviewLog_InitConfig($file);
-    $config = mz_ReviewLog_LoadConfigArray();
-  }
-  if (empty($config)) {
     return null;
   }
 
-  // 获取数量
-  $len = count($config);
-  if ($len < 1) {
-    return null;
-  }
   // 当前是第几周
-  $week = mz_ReviewLog_CurWeek();
-  // $week mod $len
-  $mod = $week % $len;
+  $week = intval(mz_ReviewLog_CurWeek());
+  $pickCate = null;
+  $minWeek = null;
 
-  return isset($config[$mod]) ? $config[$mod] : null;
+  foreach ($config as $cateItem) {
+    if (!is_array($cateItem) || !isset($cateItem["lstWeek"])) {
+      continue;
+    }
+    $lstWeek = intval($cateItem["lstWeek"]);
+    if ($lstWeek === $week) {
+      return $cateItem;
+    }
+    if ($pickCate === null || $minWeek === null || $lstWeek < $minWeek) {
+      $pickCate = $cateItem;
+      $minWeek = $lstWeek;
+    }
+  }
+
+  if ($pickCate !== null) {
+    return $pickCate;
+  }
+  return isset($config[0]) ? $config[0] : null;
 }
 
 // 初始化配置文件
@@ -324,6 +334,7 @@ function mz_ReviewLog_InitConfig($fileConfig)
       "cateID" => $cateID,
       "lstID" => $objRange->MinID,
       "lstWeek" => $lstWeek,
+      "cycled" => 0,
       "range" => array("MinID" => $objRange->MinID, "MaxID" => $objRange->MaxID),
     );
     $arrConfig[$cateID] = $cateConfig;
@@ -412,6 +423,7 @@ function mz_ReviewLog_PostStatusConvert($arg)
   return isset($map[$status]) ? $map[$status] : "未知";
 }
 
+// 路径获取函数
 function mz_ReviewLog_Path($file, $t = 'path')
 {
   global $zbp;
@@ -443,6 +455,7 @@ function mz_ReviewLog_Path($file, $t = 'path')
   }
 }
 
+// 加载配置数组
 function mz_ReviewLog_LoadConfigArray()
 {
   $file = mz_ReviewLog_Path("config");

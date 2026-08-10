@@ -18,7 +18,7 @@ if (count($_POST) > 0) {
 
 InstallPlugin_mz_ReviewLog();
 
-$pickCate = mz_ReviewLog_ReadConfig();
+// $pickCate = mz_ReviewLog_GetTgtCate();
 
 $blogtitle = '「水水」旧文章回顾';
 require $blogpath . 'zb_system/admin/admin_header.php';
