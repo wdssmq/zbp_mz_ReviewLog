@@ -257,7 +257,7 @@ function mz_ReviewLog_InitConfig($fileConfig)
   $zbp->LoadCategorys();
   $arrCateList = $zbp->categories;
   $arrConfig = array();
-  $lstWeek = mz_ReviewLog_CurWeek();
+  $lstWeek = mz_ReviewLog_CurWeek() - 1;
   foreach ($arrCateList as $Cate) {
     $cateName = $Cate->Name;
     $cateID = $Cate->ID;
