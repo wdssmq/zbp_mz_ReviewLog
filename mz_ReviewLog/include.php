@@ -257,6 +257,7 @@ function mz_ReviewLog_UpdateConfig($pickCate, $endPost)
       if (!isset($item["cateID"])) {
         continue;
       }
+      // 如果当前分类是被选中的分类，则更新其 lstWeek 和 lstID
       if ($item["cateID"] == $pickCate["cateID"]) {
         $isFirstCycle = !isset($item["cycled"]) || intval($item["cycled"]) === 0;
         $item["lstWeek"] = $curWeek;
@@ -269,6 +270,7 @@ function mz_ReviewLog_UpdateConfig($pickCate, $endPost)
           $item["lstID"] = $newID <= $maxID ? $newID : $minID;
         }
       }
+      // 更新分类的文章 ID 范围
       $itemLstID = isset($item["lstID"]) ? intval($item["lstID"]) : 0;
       $itemMinID = isset($item["range"]["MinID"]) ? intval($item["range"]["MinID"]) : 0;
       if ($itemLstID <= $itemMinID) {
