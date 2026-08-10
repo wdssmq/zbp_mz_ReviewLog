@@ -17,9 +17,15 @@ function ActivePlugin_mz_ReviewLog()
 function mz_ReviewLog_GenTpl(&$templates)
 {
   // 生成模板
-  $tplCont = file_get_contents(mz_ReviewLog_Path("tpl-view-list"));
+  $tplCont = @file_get_contents(mz_ReviewLog_Path("tpl-view-list"));
+  if ($tplCont === false) {
+    $tplCont = '';
+  }
   $templates["plugin_mz_ReviewLog_view-list"] = $tplCont;
-  $tplMod = file_get_contents(mz_ReviewLog_Path("tpl-view-mod"));
+  $tplMod = @file_get_contents(mz_ReviewLog_Path("tpl-view-mod"));
+  if ($tplMod === false) {
+    $tplMod = '';
+  }
   $templates["plugin_mz_ReviewLog_view-mod"] = $tplMod;
 
   // 随机触发构建侧栏模块
@@ -55,6 +61,13 @@ function mz_ReviewLog_KeepModFileName(&$mod)
 // 接口函数 - Feed 自动触发函数
 function mz_ReviewLog_RandBuildMod($max = 37)
 {
+  if (!is_numeric($max)) {
+    $max = 37;
+  }
+  $max = intval($max);
+  if ($max < 1) {
+    $max = 1;
+  }
   // 随机触发构建侧栏模块
   if (mt_rand(1, $max) <= 4) {
     mz_ReviewLog_BuildMod();
@@ -70,7 +83,7 @@ function InstallPlugin_mz_ReviewLog()
     @mkdir($dir, 0755);
   }
   // 初始化配置文件
-  $file = mz_ReviewLog_Path("config");;
+  $file = mz_ReviewLog_Path("config");
   if (!is_file($file)) {
     mz_ReviewLog_InitConfig($file);
   }
@@ -111,19 +124,34 @@ function mz_ReviewLog_ViewPostList($act = "return", $tpl = "mod")
   $isForMod = $tpl === "mod";
   // 读取配置文件
   $pickCate = mz_ReviewLog_ReadConfig();
+  if (!is_array($pickCate) || !isset($pickCate["cateID"])) {
+    $rlt = "暂无可用分类配置";
+    if ($act === "echo") {
+      echo $rlt;
+      return;
+    }
+    return $rlt;
+  }
   // 按照 ID 顺序获取文章
   $articles = mz_ReviewLog_GetPostByCate($pickCate, array("byId" => true, "forMod" => $isForMod));
+  if (!is_array($articles)) {
+    $articles = array();
+  }
   if ($isForMod) {
     // 按照浏览量顺序获取文章，合并到数组
-    $articles = array_merge($articles, mz_ReviewLog_GetPostByCate($pickCate, array("byId" => false, "forMod" => $isForMod)));
+    $articlesByView = mz_ReviewLog_GetPostByCate($pickCate, array("byId" => false, "forMod" => $isForMod));
+    if (is_array($articlesByView)) {
+      $articles = array_merge($articles, $articlesByView);
+    }
   } else {
-    $isNewWeek = mz_ReviewLog_UpdateConfig($pickCate, end($articles));
+    $endPost = empty($articles) ? null : end($articles);
+    mz_ReviewLog_UpdateConfig($pickCate, $endPost);
   }
   $cate = (object) array(
-    "ID" => $pickCate["cateID"],
-    "Name" => $pickCate["cateName"],
-    "MinID" => $pickCate["range"]["MinID"],
-    "MaxID" => $pickCate["range"]["MaxID"],
+    "ID" => isset($pickCate["cateID"]) ? $pickCate["cateID"] : 0,
+    "Name" => isset($pickCate["cateName"]) ? $pickCate["cateName"] : "",
+    "MinID" => isset($pickCate["range"]["MinID"]) ? $pickCate["range"]["MinID"] : 0,
+    "MaxID" => isset($pickCate["range"]["MaxID"]) ? $pickCate["range"]["MaxID"] : 0,
   );
   // 对 $articles 去重
   $articles = array_unique($articles, SORT_REGULAR);
@@ -148,6 +176,9 @@ function mz_ReviewLog_BuildMod()
   global $zbp;
   // 获取文章内容
   $modCon = mz_ReviewLog_ViewPostList("return", "mod");
+  if (!is_string($modCon)) {
+    $modCon = '';
+  }
   $zbp->LoadModules();
   // $mod = $zbp->modulesbyfilename["ReviewLog-Mod"];
   $mod = $zbp->GetModuleByFileName("ReviewLog-Mod");
@@ -168,6 +199,10 @@ function mz_ReviewLog_BuildMod()
 function mz_ReviewLog_GetPostByCate($cateConfig, $opt = array("byId" => false, "forMod" => false))
 {
   global $zbp;
+  if (!is_array($cateConfig) || !isset($cateConfig["cateID"])) {
+    return array();
+  }
+  $opt = array_merge(array("byId" => false, "forMod" => false), (array)$opt);
   // ----
   $cateID = $cateConfig["cateID"];
   $lstID = $cateConfig["lstID"];
@@ -200,26 +235,39 @@ function mz_ReviewLog_GetPostByCate($cateConfig, $opt = array("byId" => false, "
 // 更新配置文件
 function mz_ReviewLog_UpdateConfig($pickCate, $endPost)
 {
+  if (!is_array($pickCate) || !isset($pickCate["cateID"])) {
+    return false;
+  }
   // 读取配置文件
   $file = mz_ReviewLog_Path("config");
-  $config = file_get_contents($file);
-  $config = json_decode($config, true);
+  $config = mz_ReviewLog_LoadConfigArray();
+  if (empty($config)) {
+    return false;
+  }
 
   $curWeek = mz_ReviewLog_CurWeek();
-  $lstWeek = $pickCate["lstWeek"];
-  $newID = $endPost->ID + 1;
+  $lstWeek = isset($pickCate["lstWeek"]) ? intval($pickCate["lstWeek"]) : 0;
+  $endID = (is_object($endPost) && isset($endPost->ID)) ? intval($endPost->ID) : (isset($pickCate["lstID"]) ? intval($pickCate["lstID"]) : 0);
+  $newID = $endID + 1;
 
   $bolRlt = false;
 
   if ($curWeek != $lstWeek) {
     foreach ($config as $key => &$item) {
+      if (!isset($item["cateID"])) {
+        continue;
+      }
       if ($item["cateID"] == $pickCate["cateID"]) {
         $item["lstWeek"] = $curWeek;
-        $item["lstID"] = $newID <= $item["range"]["MaxID"] ? $newID : $item["range"]["MinID"];
+        $maxID = isset($item["range"]["MaxID"]) ? intval($item["range"]["MaxID"]) : 0;
+        $minID = isset($item["range"]["MinID"]) ? intval($item["range"]["MinID"]) : 0;
+        $item["lstID"] = $newID <= $maxID ? $newID : $minID;
       }
-      if ($item["lstID"] <= $item["range"]["MinID"]) {
+      $itemLstID = isset($item["lstID"]) ? intval($item["lstID"]) : 0;
+      $itemMinID = isset($item["range"]["MinID"]) ? intval($item["range"]["MinID"]) : 0;
+      if ($itemLstID <= $itemMinID) {
         $objRange = mz_ReviewLog_QueryRangeByCate($item["cateID"]);
-        $item["range"] = $objRange;
+        $item["range"] = array("MinID" => $objRange->MinID, "MaxID" => $objRange->MaxID);
       }
     }
     file_put_contents($file, json_encode($config));
@@ -237,17 +285,26 @@ function mz_ReviewLog_ReadConfig()
   if (!is_file($file)) {
     mz_ReviewLog_InitConfig($file);
   }
-  $config = file_get_contents($file);
-  $config = json_decode($config, true);
+  $config = mz_ReviewLog_LoadConfigArray();
+  if (empty($config)) {
+    mz_ReviewLog_InitConfig($file);
+    $config = mz_ReviewLog_LoadConfigArray();
+  }
+  if (empty($config)) {
+    return null;
+  }
 
   // 获取数量
   $len = count($config);
+  if ($len < 1) {
+    return null;
+  }
   // 当前是第几周
   $week = mz_ReviewLog_CurWeek();
   // $week mod $len
   $mod = $week % $len;
 
-  return $config[$mod];
+  return isset($config[$mod]) ? $config[$mod] : null;
 }
 
 // 初始化配置文件
@@ -267,7 +324,7 @@ function mz_ReviewLog_InitConfig($fileConfig)
       "cateID" => $cateID,
       "lstID" => $objRange->MinID,
       "lstWeek" => $lstWeek,
-      "range" => $objRange,
+      "range" => array("MinID" => $objRange->MinID, "MaxID" => $objRange->MaxID),
     );
     $arrConfig[$cateID] = $cateConfig;
   }
@@ -282,6 +339,7 @@ function mz_ReviewLog_InitConfig($fileConfig)
 function mz_ReviewLog_QueryRangeByCate($cateID)
 {
   global $zbp;
+  $cateID = intval($cateID);
   $sql = $zbp->db->sql->Select(
     $zbp->table['Post'],
     array("MIN(log_ID)", "MAX(log_ID)"),
@@ -292,8 +350,24 @@ function mz_ReviewLog_QueryRangeByCate($cateID)
     )
   );
   $rltQuery = $zbp->db->Query($sql);
-  list($min, $max) = explode(':', join(":", $rltQuery[0]));
-  return (object)array("MinID" => ceil($min), "MaxID" => ceil($max));
+  $min = 0;
+  $max = 0;
+  if (is_array($rltQuery) && isset($rltQuery[0])) {
+    $row = is_array($rltQuery[0]) ? array_values($rltQuery[0]) : array();
+    if (isset($row[0]) && is_numeric($row[0])) {
+      $min = intval($row[0]);
+    }
+    if (isset($row[1]) && is_numeric($row[1])) {
+      $max = intval($row[1]);
+    }
+  }
+  if ($min < 0) {
+    $min = 0;
+  }
+  if ($max < $min) {
+    $max = $min;
+  }
+  return (object)array("MinID" => $min, "MaxID" => $max);
 }
 
 // 时间戳转周数
@@ -335,12 +409,15 @@ function mz_ReviewLog_PostStatusConvert($arg)
     1 => "草稿",
     2 => "审核",
   );
-  return $map[$status];
+  return isset($map[$status]) ? $map[$status] : "未知";
 }
 
 function mz_ReviewLog_Path($file, $t = 'path')
 {
   global $zbp;
+  if ($t !== 'path' && $t !== 'host') {
+    $t = 'path';
+  }
   $result = $zbp->$t . 'zb_users/plugin/mz_ReviewLog/';
   switch ($file) {
     case 'tpl-view-list':
@@ -364,4 +441,21 @@ function mz_ReviewLog_Path($file, $t = 'path')
     default:
       return $result . $file;
   }
+}
+
+function mz_ReviewLog_LoadConfigArray()
+{
+  $file = mz_ReviewLog_Path("config");
+  if (!is_file($file)) {
+    return array();
+  }
+  $config = @file_get_contents($file);
+  if ($config === false || $config === '') {
+    return array();
+  }
+  $json = json_decode($config, true);
+  if (!is_array($json)) {
+    return array();
+  }
+  return $json;
 }
