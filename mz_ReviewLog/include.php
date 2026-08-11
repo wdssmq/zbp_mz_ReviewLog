@@ -397,11 +397,6 @@ function mz_ReviewLog_DeBug()
   $offset = 0;
   if (isset($_GET['offset']) && is_numeric($_GET['offset'])) {
     $offset = intval($_GET['offset']);
-  } else {
-    $cfg = $zbp->Config('mz_ReviewLog');
-    if (isset($cfg->offset) && is_numeric($cfg->offset)) {
-      $offset = intval($cfg->offset);
-    }
   }
   if ($offset < 0) {
     $offset = 0;
