@@ -1,5 +1,5 @@
 <h3>
-  {$cate.ID} | {$cate.Name} | {$cate.MinID} - {$cate.MaxID}
+  {$cate.ID} | {$cate.Name} | {$cate.MinID} - {$cate.MaxID} | {$curWeek}
 </h3>
 
 {foreach $articles as $article}

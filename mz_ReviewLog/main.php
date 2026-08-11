@@ -32,7 +32,7 @@ require $blogpath . 'zb_system/admin/admin_top.php';
   <div class="divHeader"><?php echo $blogtitle; ?></div>
   <div class="SubMenu">
     <a href="main.php" title="首页"><span class="m-left m-now">首页</span></a>
-    <a href="<?php echo htmlspecialchars($debugUrl, ENT_QUOTES, 'UTF-8'); ?>" title="Debug +1"><span class="m-left">Debug +1</span></a>
+    <a href="<?php echo htmlspecialchars($debugUrl, ENT_QUOTES, 'UTF-8'); ?>" title="Debug +1" class="hidden"><span class="m-left">Debug +1</span></a>
     <?php require "about.php"; ?>
   </div>
   <div id="divMain2">
