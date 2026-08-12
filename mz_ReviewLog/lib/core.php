@@ -96,10 +96,14 @@ class mz_ReviewLog_Core
 
     $curWeek = self::CurWeek();
     $lstWeek = isset($pickCate["lstWeek"]) ? intval($pickCate["lstWeek"]) : 0;
-    $endID = (is_object($endPost) && isset($endPost->ID)) ? intval($endPost->ID) : (isset($pickCate["lstID"]) ? intval($pickCate["lstID"]) : 0);
+    $endID = (is_object($endPost) && isset($endPost->ID)) ? intval($endPost->ID) : -1;
     $newID = $endID + 1;
 
     $bolRlt = false;
+
+    if ($newID <= 0) {
+      return false;
+    }
 
     if ($curWeek != $lstWeek) {
       foreach ($config as $key => &$item) {
