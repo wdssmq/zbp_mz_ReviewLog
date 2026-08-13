@@ -33,7 +33,6 @@ require $blogpath . 'zb_system/admin/admin_top.php';
   <div class="SubMenu">
     <a href="main.php" title="首页"><span class="m-left m-now">首页</span></a>
     <a href="<?php echo htmlspecialchars($debugUrl, ENT_QUOTES, 'UTF-8'); ?>" title="Debug +1"><span class="m-left">Debug +1</span></a>
-    <?php require "about.php"; ?>
   </div>
   <div id="divMain2">
     <?php mz_ReviewLog_ViewPostList("echo", "list"); ?>
@@ -43,6 +42,7 @@ require $blogpath . 'zb_system/admin/admin_top.php';
     <p><a href="https://app.zblogcn.com/?id=31464" target="_blank" title="旧文章回顾 - Z-Blog 应用中心">https://app.zblogcn.com/?id=31464</a></p>
   </div>
 </div>
+<?php require "about.php"; ?>
 
 <?php
 require $blogpath . 'zb_system/admin/admin_footer.php';
