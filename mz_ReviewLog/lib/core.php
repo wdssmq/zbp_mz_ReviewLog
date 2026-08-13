@@ -118,10 +118,6 @@ class mz_ReviewLog_Core
 
     $bolRlt = false;
 
-    if ($newID <= 0) {
-      return false;
-    }
-
     if ($curWeek != $lstWeek) {
       foreach ($config as $key => &$item) {
         if (!isset($item["cateID"])) {
