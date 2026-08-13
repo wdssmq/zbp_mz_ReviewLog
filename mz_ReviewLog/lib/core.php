@@ -2,11 +2,20 @@
 
 class mz_ReviewLog_Core
 {
-
   private static $configCache = null;
+  private static $configCacheKey = null;
   private static $curWeekCache = null;
-  private static $debugWeekCache = null;
   private static $targetCateCache = null;
+  private static $targetCateCacheKey = null;
+
+  // 根据 offset 选择正式或 debug 配置路径
+  private static function ResolveConfigPath()
+  {
+    if (self::DeBug() > 0) {
+      return mz_ReviewLog_Path("config.debug");
+    }
+    return mz_ReviewLog_Path("config");
+  }
 
   // 初始化配置文件
   public static function InitConfig($fileConfig)
@@ -38,27 +47,34 @@ class mz_ReviewLog_Core
   // 读取配置数组
   public static function LoadConfigArray($fileConfig = null)
   {
-    if (self::$configCache !== null) {
-      return self::$configCache;
-    }
     if ($fileConfig === null) {
-      $fileConfig = mz_ReviewLog_Path("config");
+      $fileConfig = self::ResolveConfigPath();
     }
-    if (!is_file($fileConfig)) {
-      self::$configCache = array();
+    if (self::$configCache !== null && self::$configCacheKey === $fileConfig) {
       return self::$configCache;
     }
-    $config = @file_get_contents($fileConfig);
-    if ($config === false || $config === '') {
-      self::$configCache = array();
-      return self::$configCache;
+    // Debug 模式首次访问时自动生成独立配置，避免直接空配置。
+    if (self::DeBug() > 0 && strpos($fileConfig, 'config.debug.json') !== false && !is_file($fileConfig)) {
+      $baseFile = str_replace('config.debug.json', 'config.json', $fileConfig);
+      if (is_file($baseFile)) {
+        $baseConfig = self::LoadConfigArray($baseFile);
+        if (is_array($baseConfig) && !empty($baseConfig)) {
+          self::SaveConfigArray($baseConfig, $fileConfig);
+        }
+      }
     }
-    $json = json_decode($config, true);
-    if (!is_array($json)) {
-      self::$configCache = array();
-      return self::$configCache;
+    $cacheData = array();
+    if (is_file($fileConfig)) {
+      $config = @file_get_contents($fileConfig);
+      if ($config !== false && $config !== '') {
+        $json = json_decode($config, true);
+        if (is_array($json)) {
+          $cacheData = $json;
+        }
+      }
     }
-    self::$configCache = $json;
+    self::$configCache = $cacheData;
+    self::$configCacheKey = $fileConfig;
     return self::$configCache;
   }
 
@@ -66,7 +82,7 @@ class mz_ReviewLog_Core
   public static function SaveConfigArray($config, $fileConfig = null)
   {
     if ($fileConfig === null) {
-      $fileConfig = mz_ReviewLog_Path("config");
+      $fileConfig = self::ResolveConfigPath();
     }
     if (!is_array($config)) {
       $config = array();
@@ -76,6 +92,7 @@ class mz_ReviewLog_Core
       return false;
     }
     self::$configCache = $config;
+    self::$configCacheKey = $fileConfig;
     self::ResetTargetCateCache();
     return true;
   }
@@ -87,7 +104,7 @@ class mz_ReviewLog_Core
       return false;
     }
     if ($fileConfig === null) {
-      $fileConfig = mz_ReviewLog_Path("config");
+      $fileConfig = self::ResolveConfigPath();
     }
     $config = self::LoadConfigArray($fileConfig);
     if (empty($config)) {
@@ -138,73 +155,91 @@ class mz_ReviewLog_Core
   // 获取当前目标分类
   public static function GetTgtCate($fileConfig = null)
   {
-    if (self::$curWeekCache !== null && self::$targetCateCache !== null) {
+    if ($fileConfig === null) {
+      $fileConfig = self::ResolveConfigPath();
+    }
+
+    $curWeek = self::CurWeek();
+    $cacheKey = $fileConfig . '|' . $curWeek;
+
+    if (self::$targetCateCache !== null && self::$targetCateCacheKey === $cacheKey) {
       return self::$targetCateCache;
     }
+
     $config = self::LoadConfigArray($fileConfig);
-    $curWeek = self::CurWeek();
-    if (empty($config)) {
-      self::$targetCateCache = null;
-      return null;
+    $result = null;
+
+    if (!empty($config)) {
+      $pickCate = null;
+      $minWeek = null;
+
+      foreach ($config as $cateItem) {
+        if (!is_array($cateItem) || !isset($cateItem["lstWeek"])) {
+          continue;
+        }
+        $lstWeek = intval($cateItem["lstWeek"]);
+        if ($lstWeek === $curWeek) {
+          $result = $cateItem;
+          break;
+        }
+        if ($pickCate === null || $minWeek === null || $lstWeek < $minWeek) {
+          $pickCate = $cateItem;
+          $minWeek = $lstWeek;
+        }
+      }
+
+      if ($result === null) {
+        if ($pickCate !== null) {
+          $result = $pickCate;
+        } else {
+          $result = isset($config[0]) ? $config[0] : null;
+        }
+      }
     }
 
-    $pickCate = null;
-    $minWeek = null;
-
-    foreach ($config as $cateItem) {
-      if (!is_array($cateItem) || !isset($cateItem["lstWeek"])) {
-        continue;
-      }
-      $lstWeek = intval($cateItem["lstWeek"]);
-      if ($lstWeek === $curWeek) {
-        self::$targetCateCache = $cateItem;
-        return $cateItem;
-      }
-      if ($pickCate === null || $minWeek === null || $lstWeek < $minWeek) {
-        $pickCate = $cateItem;
-        $minWeek = $lstWeek;
-      }
-    }
-
-    if ($pickCate !== null) {
-      self::$targetCateCache = $pickCate;
-      return $pickCate;
-    }
-
-    self::$targetCateCache = isset($config[0]) ? $config[0] : null;
-    return self::$targetCateCache;
+    self::$targetCateCache = $result;
+    self::$targetCateCacheKey = $cacheKey;
+    return $result;
   }
 
   // 重置目标分类缓存
   public static function ResetTargetCateCache()
   {
     self::$targetCateCache = null;
-    self::$curWeekCache = null;
+    self::$targetCateCacheKey = null;
   }
 
   // 获取当前周数
   public static function CurWeek()
   {
+    $offset = self::DeBug();
 
     if (self::$curWeekCache !== null) {
-      return self::$curWeekCache;
+      return intval(self::$curWeekCache + $offset);
     }
+
     $timestamp = time();
     $week = ceil($timestamp / (7 * 86400));
     self::$curWeekCache = $week;
-    $offset = self::DeBug();
-    if ($offset > 0) {
-      self::$debugWeekCache = $week + $offset;
-    }
-    return $week;
+    return intval($week + $offset);
   }
 
   // 调试模式下的偏移量
-  public static function DeBug()
+  public static function DeBug($withConfig = false)
   {
+    global $zbp;
     $offset = 0;
+    // 优先从参数获取偏移量
     if (isset($_GET['offset']) && is_numeric($_GET['offset'])) {
       $offset = intval($_GET['offset']);
+      if ($withConfig) {
+        $zbp->Config('mz_ReviewLog')->offset = $offset;
+        $zbp->SaveConfig('mz_ReviewLog');
+      }
+    } else if ($withConfig) {
+      // 如果没有参数，则从配置中读取偏移量
+      $cfg = $zbp->Config('mz_ReviewLog');
+      $offset  = isset($cfg->offset) ? intval($cfg->offset) : 0;
     }
     if ($offset < 0) {
       $offset = 0;

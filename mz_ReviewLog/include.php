@@ -63,6 +63,19 @@ function mz_ReviewLog_KeepModFileName(&$mod)
 // 接口函数 - Feed 自动触发函数
 function mz_ReviewLog_RandBuildMod($max = 37)
 {
+  global $zbp;
+  $lstTime = $zbp->Config('mz_ReviewLog')->lstTime;
+  $curTime = time();
+  if (!is_numeric($lstTime) || $lstTime < 0) {
+    $lstTime = 0;
+  }
+  // 每小时最多触发一次
+  if ($curTime - $lstTime < 3600) {
+    return;
+  }
+  $zbp->Config('mz_ReviewLog')->lstTime = $curTime;
+  $zbp->SaveConfig('mz_ReviewLog');
+
   if (!is_numeric($max)) {
     $max = 37;
   }
@@ -90,11 +103,25 @@ function InstallPlugin_mz_ReviewLog()
     mz_ReviewLog_Core::InitConfig($file);
   }
   $zbp->BuildTemplate();
+  mz_ReviewLog_ResetDebugData();
 }
 
 function UninstallPlugin_mz_ReviewLog() {}
 
 // ----------
+
+// 重置 debug 数据
+function mz_ReviewLog_ResetDebugData()
+{
+  global $zbp;
+  // offset 大于等于 137 时，重置为 0，并删除 config.debug.json 文件
+  $offset = $zbp->Config('mz_ReviewLog')->offset;
+  if (is_numeric($offset) && $offset >= 137) {
+    $zbp->Config('mz_ReviewLog')->offset = 0;
+    @unlink(mz_ReviewLog_Path("config.debug"));
+    $zbp->SaveConfig('mz_ReviewLog');
+  }
+}
 
 // 写入通知插件
 function mz_ReviewLog_WriteNotice($con)
@@ -303,6 +330,9 @@ function mz_ReviewLog_Path($file, $t = 'path')
       break;
     case 'config':
       return $result . 'usr/config.json';
+      break;
+    case 'config.debug':
+      return $result . 'usr/config.debug.json';
       break;
     case 'usr':
       return $result . 'usr/';
