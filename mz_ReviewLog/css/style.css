@@ -1,3 +1,7 @@
+#divMain .post {
+  margin-bottom: 3px;
+}
+
 #divMain .post a {
   color: #1d4c7d;
 }
